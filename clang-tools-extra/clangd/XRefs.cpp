@@ -2227,8 +2227,6 @@ std::vector<TypeHierarchyItem> subTypes(const TypeHierarchyItem &Item,
                                         const SymbolIndex *Index) {
   std::vector<TypeHierarchyItem> Results;
   fillSubTypes(Item.data.symbolID, Results, Index, 1, Item.uri.file());
-  for (auto &ChildSym : Results)
-    ChildSym.data.parents = {Item.data};
   return Results;
 }
 

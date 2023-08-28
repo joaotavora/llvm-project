@@ -785,15 +785,6 @@ struct Child : Parent1, Parent2 {};
                                  testPath(TU.Filename));
   ASSERT_THAT(Result, SizeIs(1));
   auto Children = subTypes(Result.front(), Index.get());
-
-  // Make sure parents are populated when getting children.
-  // FIXME: This is partial.
-  EXPECT_THAT(
-      Children,
-      UnorderedElementsAre(
-          AllOf(withName("Child"),
-                withResolveParents(HasValue(UnorderedElementsAre(withResolveID(
-                    getSymbolID(&findDecl(AST, "Parent1")).str())))))));
 }
 
 TEST(Standard, SuperTypes) {
