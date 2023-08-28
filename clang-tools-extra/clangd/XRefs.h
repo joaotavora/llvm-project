@@ -127,6 +127,12 @@ std::vector<const CXXRecordDecl *> findRecordTypeAt(ParsedAST &AST,
 std::vector<const CXXRecordDecl *> typeParents(const CXXRecordDecl *CXXRD);
 
 /// Get type hierarchy information at \p Pos.
+std::vector<TypeHierarchyItem> prepareTypeHierarchy(ParsedAST &AST,
+                                                    Position Pos,
+                                                    const SymbolIndex *Index,
+                                                    PathRef TUPath);
+
+/// Same, but specific to VSCode extension (not LSP)
 std::vector<TypeHierarchyItem> getTypeHierarchy(
     ParsedAST &AST, Position Pos, int Resolve, TypeHierarchyDirection Direction,
     const SymbolIndex *Index = nullptr, PathRef TUPath = PathRef{});
@@ -139,6 +145,7 @@ superTypes(const TypeHierarchyItem &Item, const SymbolIndex *Index);
 std::vector<TypeHierarchyItem> subTypes(const TypeHierarchyItem &Item,
                                         const SymbolIndex *Index);
 
+/// Specific to VSCode extension
 void resolveTypeHierarchy(TypeHierarchyItem &Item, int ResolveLevels,
                           TypeHierarchyDirection Direction,
                           const SymbolIndex *Index);

@@ -1305,8 +1305,9 @@ void ClangdLSPServer::onResolveTypeHierarchy(
 void ClangdLSPServer::onPrepareTypeHierarchy(
     const TypeHierarchyPrepareParams &Params,
     Callback<std::vector<TypeHierarchyItem>> Reply) {
-  Server->typeHierarchy(Params.textDocument.uri.file(), Params.position,
-                        Params.resolve, Params.direction, std::move(Reply));
+  Server->prepareTypeHierarchy(Params.textDocument.uri.file(), Params.position,
+                               Params.resolve, Params.direction,
+                               std::move(Reply));
 }
 
 void ClangdLSPServer::onSuperTypes(

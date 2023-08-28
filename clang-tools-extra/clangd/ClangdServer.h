@@ -265,6 +265,10 @@ public:
                  Callback<std::optional<HoverInfo>> CB);
 
   /// Get information about type hierarchy for a given position.
+  void prepareTypeHierarchy(PathRef File, Position Pos, int Resolve,
+                            TypeHierarchyDirection Direction,
+                            Callback<std::vector<TypeHierarchyItem>> CB);
+  /// Same, but specific to VSCode extension (not LSP)
   void typeHierarchy(PathRef File, Position Pos, int Resolve,
                      TypeHierarchyDirection Direction,
                      Callback<std::vector<TypeHierarchyItem>> CB);

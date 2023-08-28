@@ -2197,6 +2197,25 @@ getTypeHierarchy(ParsedAST &AST, Position Pos, int ResolveLevels,
   return Results;
 }
 
+std::vector<TypeHierarchyItem> prepareTypeHierarchy(ParsedAST &AST,
+                                                    Position Pos,
+                                                    const SymbolIndex *Index,
+                                                    PathRef TUPath) {
+  std::vector<TypeHierarchyItem> Results;
+  for (const auto *CXXRD : findRecordTypeAt(AST, Pos)) {
+
+    // Use the template pattern if it exists
+    if (auto *CTSD = dyn_cast<ClassTemplateSpecializationDecl>(CXXRD))
+      CXXRD = CTSD->getTemplateInstantiationPattern();
+
+    std::optional<TypeHierarchyItem> Result =
+        declToTypeHierarchyItem(*CXXRD, AST.tuPath());
+    Results.emplace_back(std::move(*Result));
+  }
+
+  return Results;
+}
+
 std::optional<std::vector<TypeHierarchyItem>>
 superTypes(const TypeHierarchyItem &Item, const SymbolIndex *Index) {
   std::vector<TypeHierarchyItem> Results;

@@ -853,6 +853,19 @@ void ClangdServer::typeHierarchy(PathRef File, Position Pos, int Resolve,
   WorkScheduler->runWithAST("TypeHierarchy", File, std::move(Action));
 }
 
+void ClangdServer::prepareTypeHierarchy(PathRef File, Position Pos, int Resolve,
+                                 TypeHierarchyDirection Direction,
+                                 Callback<std::vector<TypeHierarchyItem>> CB) {
+  auto Action = [File = File.str(), Pos, Resolve, Direction, CB = std::move(CB),
+                 this](Expected<InputsAndAST> InpAST) mutable {
+    if (!InpAST)
+      return CB(InpAST.takeError());
+    CB(clangd::prepareTypeHierarchy(InpAST->AST, Pos, Index, File));
+  };
+
+  WorkScheduler->runWithAST("PrepareTypeHierarchy", File, std::move(Action));
+}
+
 void ClangdServer::superTypes(
     const TypeHierarchyItem &Item,
     Callback<std::optional<std::vector<TypeHierarchyItem>>> CB) {
