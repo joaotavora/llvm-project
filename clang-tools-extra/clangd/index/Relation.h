@@ -20,6 +20,7 @@ namespace clangd {
 enum class RelationKind : uint8_t {
   BaseOf,
   OverriddenBy,
+  DerivedFrom,
 };
 
 /// Represents a relation between two symbols.

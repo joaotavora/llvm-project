@@ -315,6 +315,7 @@ std::vector<LocatedSymbol> findImplementors(llvm::DenseSet<SymbolID> IDs,
   case RelationKind::OverriddenBy:
     FindImplementorsMetric.record(1, "find-override");
     break;
+  default: break;
   }
 
   RelationsRequest Req;
@@ -1782,22 +1783,40 @@ symbolToCallHierarchyItem(const Symbol &S, PathRef TUPath) {
   return Result;
 }
 
+static void fillSubOrSuperTypes(
+    const SymbolID &ID, RelationKind Kind, std::vector<TypeHierarchyItem> &Out,
+    std::optional<std::vector<TypeHierarchyItem>> TypeHierarchyItem::*PMember,
+    const SymbolIndex *Index, int Levels, PathRef TUPath) {
+  RelationsRequest Req;
+  Req.Subjects.insert(ID);
+  Req.Predicate = Kind,
+  Index->relations(Req, [&](const SymbolID &Subject, const Symbol &Object) {
+    if (auto TIH = symbolToTypeHierarchyItem(Object, TUPath)) {
+      if (Levels > 1) {
+        ((*TIH).*PMember).emplace();
+        fillSubOrSuperTypes(Object.ID, Kind, Out, PMember, Index, Levels - 1, TUPath);
+      }
+      Out.emplace_back(std::move(*TIH));
+    }
+  });
+}
+
 static void fillSubTypes(const SymbolID &ID,
                          std::vector<TypeHierarchyItem> &SubTypes,
                          const SymbolIndex *Index, int Levels, PathRef TUPath) {
-  RelationsRequest Req;
-  Req.Subjects.insert(ID);
-  Req.Predicate = RelationKind::BaseOf;
-  Index->relations(Req, [&](const SymbolID &Subject, const Symbol &Object) {
-    if (std::optional<TypeHierarchyItem> ChildSym =
-            symbolToTypeHierarchyItem(Object, TUPath)) {
-      if (Levels > 1) {
-        ChildSym->children.emplace();
-        fillSubTypes(Object.ID, *ChildSym->children, Index, Levels - 1, TUPath);
-      }
-      SubTypes.emplace_back(std::move(*ChildSym));
-    }
-  });
+  fillSubOrSuperTypes(ID, RelationKind::BaseOf, SubTypes,
+                      &TypeHierarchyItem::children,
+                      Index, Levels, TUPath);
+}
+
+
+
+static void fillSuperTypes(const SymbolID &ID,
+                         std::vector<TypeHierarchyItem> &SuperTypes,
+                         const SymbolIndex *Index, int Levels, PathRef TUPath) {
+  fillSubOrSuperTypes(ID, RelationKind::DerivedFrom, SuperTypes,
+                      &TypeHierarchyItem::parents,
+                      Index, Levels, TUPath);
 }
 
 using RecursionProtectionSet = llvm::SmallSet<const CXXRecordDecl *, 4>;
@@ -2181,22 +2200,7 @@ getTypeHierarchy(ParsedAST &AST, Position Pos, int ResolveLevels,
 std::optional<std::vector<TypeHierarchyItem>>
 superTypes(const TypeHierarchyItem &Item, const SymbolIndex *Index) {
   std::vector<TypeHierarchyItem> Results;
-  if (!Item.data.parents)
-    return std::nullopt;
-  if (Item.data.parents->empty())
-    return Results;
-  LookupRequest Req;
-  llvm::DenseMap<SymbolID, const TypeHierarchyItem::ResolveParams *> IDToData;
-  for (const auto &Parent : *Item.data.parents) {
-    Req.IDs.insert(Parent.symbolID);
-    IDToData[Parent.symbolID] = &Parent;
-  }
-  Index->lookup(Req, [&Item, &Results, &IDToData](const Symbol &S) {
-    if (auto THI = symbolToTypeHierarchyItem(S, Item.uri.file())) {
-      THI->data = *IDToData.lookup(S.ID);
-      Results.emplace_back(std::move(*THI));
-    }
-  });
+  fillSuperTypes(Item.data.symbolID, Results, Index, 1, Item.uri.file());
   return Results;
 }
 

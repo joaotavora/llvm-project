@@ -27,10 +27,17 @@ public:
       Index[S.ID] = &S;
     for (const std::pair<SymbolID, llvm::ArrayRef<Ref>> &R : Refs)
       this->Refs.try_emplace(R.first, R.second.begin(), R.second.end());
-    for (const Relation &R : Relations)
+    for (const Relation &R : Relations) {
       this->Relations[std::make_pair(R.Subject,
                                      static_cast<uint8_t>(R.Predicate))]
           .push_back(R.Object);
+      // In the memory index only, store BaseOf and the reverse
+      // DerivedFrom relation.
+      if (R.Predicate == RelationKind::BaseOf)
+        this->Relations[std::make_pair(R.Object,
+                                       static_cast<uint8_t>(RelationKind::DerivedFrom))]
+          .push_back(R.Subject);
+    }
   }
   // Symbols are owned by BackingData, Index takes ownership.
   template <typename SymbolRange, typename RefRange, typename RelationRange,
