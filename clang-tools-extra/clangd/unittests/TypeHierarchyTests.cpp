@@ -27,6 +27,7 @@ using ::testing::AllOf;
 using ::testing::ElementsAre;
 using ::testing::Field;
 using ::testing::IsEmpty;
+using ::testing::IsFalse;
 using ::testing::Matcher;
 using ::testing::SizeIs;
 using ::testing::UnorderedElementsAre;
@@ -813,7 +814,7 @@ struct Chil^d : Parent {};
 
   EXPECT_THAT(Parents, HasValue(UnorderedElementsAre(
                            AllOf(withName("Parent"),
-                                 withResolveParents(HasValue(IsEmpty()))))));
+                                 withResolveParents(IsFalse())))));
 }
 } // namespace
 } // namespace clangd
