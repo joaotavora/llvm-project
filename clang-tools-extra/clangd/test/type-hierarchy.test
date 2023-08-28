@@ -9,18 +9,7 @@
 # CHECK-NEXT:  "result": [
 # CHECK-NEXT:     {
 # CHECK-NEXT:       "data": {
-# CHECK-NEXT:         "parents": [
-# CHECK-NEXT:          {
-# CHECK-NEXT:           "parents": [
-# CHECK-NEXT:             {
-# CHECK-NEXT:              "parents": [],
-# CHECK-NEXT:              "symbolID": "FE546E7B648D69A7"
-# CHECK-NEXT:             }
-# CHECK-NEXT:           ],
-# CHECK-NEXT:           "symbolID": "ECDC0C46D75120F4"
-# CHECK-NEXT:          }
-# CHECK-NEXT:        ],
-# CHECK-NEXT:        "symbolID": "8A991335E4E67D08"
+# CHECK-NEXT:         "symbolID": "8A991335E4E67D08"
 # CHECK-NEXT:       },
 # CHECK-NEXT:       "kind": 23,
 # CHECK-NEXT:       "name": "Child2",
@@ -54,12 +43,6 @@
 # CHECK-NEXT:  "result": [
 # CHECK-NEXT:     {
 # CHECK-NEXT:       "data": {
-# CHECK-NEXT:         "parents": [
-# CHECK-NEXT:           {
-# CHECK-NEXT:            "parents": [],
-# CHECK-NEXT:            "symbolID": "FE546E7B648D69A7"
-# CHECK-NEXT:           }
-# CHECK-NEXT:         ],
 # CHECK-NEXT:         "symbolID": "ECDC0C46D75120F4"
 # CHECK-NEXT:       },
 # CHECK-NEXT:       "kind": 23,
@@ -94,23 +77,7 @@
 # CHECK-NEXT:  "result": [
 # CHECK-NEXT:     {
 # CHECK-NEXT:       "data": {
-# CHECK-NEXT:         "parents": [
-# CHECK-NEXT:          {
-# CHECK-NEXT:           "parents": [
-# CHECK-NEXT:            {
-# CHECK-NEXT:             "parents": [
-# CHECK-NEXT:               {
-# CHECK-NEXT:                "parents": [],
-# CHECK-NEXT:                "symbolID": "FE546E7B648D69A7"
-# CHECK-NEXT:               }
-# CHECK-NEXT:             ],
-# CHECK-NEXT:             "symbolID": "ECDC0C46D75120F4"
-# CHECK-NEXT:            }
-# CHECK-NEXT:           ],
-# CHECK-NEXT:           "symbolID": "8A991335E4E67D08"
-# CHECK-NEXT:         }
-# CHECK-NEXT:        ],
-# CHECK-NEXT:        "symbolID": "A6576FE083F2949A"
+# CHECK-NEXT:         "symbolID": "A6576FE083F2949A"
 # CHECK-NEXT:       },
 # CHECK-NEXT:       "kind": 23,
 # CHECK-NEXT:       "name": "Child3",
