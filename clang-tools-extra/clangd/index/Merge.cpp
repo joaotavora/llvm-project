@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "Merge.h"
+#include "index/Index.h"
 #include "index/Symbol.h"
 #include "index/SymbolLocation.h"
 #include "index/SymbolOrigin.h"
@@ -142,6 +143,41 @@ bool MergedIndex::refs(const RefsRequest &Req,
   // We return less than Req.Limit if static index returns more refs for dirty
   // files.
   bool StaticHadMore = Static->refs(Req, [&](const Ref &O) {
+    if ((DynamicContainsFile(O.Location.FileURI) & IndexContents::References) !=
+        IndexContents::None)
+      return; // ignore refs that have been seen from dynamic index.
+    if (Remaining == 0) {
+      More = true;
+      return;
+    }
+    --Remaining;
+    Callback(O);
+  });
+  return More || StaticHadMore;
+}
+
+bool MergedIndex::refersTo(
+    const RefsRequest &Req,
+    llvm::function_ref<void(const RefersToResult &)> Callback) const {
+  trace::Span Tracer("MergedIndex refersTo");
+  bool More = false;
+  uint32_t Remaining =
+      Req.Limit.value_or(std::numeric_limits<uint32_t>::max());
+  // We don't want duplicated refs from the static/dynamic indexes,
+  // and we can't reliably deduplicate them because offsets may differ slightly.
+  // We consider the dynamic index authoritative and report all its refs,
+  // and only report static index refs from other files.
+  More |= Dynamic->refersTo(Req, [&](const auto &O) {
+    Callback(O);
+    assert(Remaining != 0);
+    --Remaining;
+  });
+  if (Remaining == 0 && More)
+    return More;
+  auto DynamicContainsFile = Dynamic->indexedFiles();
+  // We return less than Req.Limit if static index returns more refs for dirty
+  // files.
+  bool StaticHadMore = Static->refersTo(Req, [&](const RefersToResult &O) {
     if ((DynamicContainsFile(O.Location.FileURI) & IndexContents::References) !=
         IndexContents::None)
       return; // ignore refs that have been seen from dynamic index.

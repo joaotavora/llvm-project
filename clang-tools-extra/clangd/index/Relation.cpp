@@ -19,6 +19,8 @@ llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const RelationKind R) {
     return OS << "BaseOf";
   case RelationKind::OverriddenBy:
     return OS << "OverriddenBy";
+  case RelationKind::DerivedFrom:
+    return OS << "DerivedFrom";
   }
   llvm_unreachable("Unhandled RelationKind enum.");
 }

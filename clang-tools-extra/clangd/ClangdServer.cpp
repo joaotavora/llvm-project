@@ -912,6 +912,15 @@ void ClangdServer::incomingCalls(
                      });
 }
 
+void ClangdServer::outgoingCalls(
+    const CallHierarchyItem &Item,
+    Callback<std::vector<CallHierarchyOutgoingCall>> CB) {
+  WorkScheduler->run("Outgoing Calls", "",
+                     [CB = std::move(CB), Item, this]() mutable {
+                       CB(clangd::outgoingCalls(Item, Index));
+                     });
+}
+
 void ClangdServer::inlayHints(PathRef File, std::optional<Range> RestrictRange,
                               Callback<std::vector<InlayHint>> CB) {
   auto Action = [RestrictRange(std::move(RestrictRange)),
